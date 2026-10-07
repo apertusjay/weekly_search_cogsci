@@ -1,1 +1,32 @@
+name: Weekly Cognitive Science Digest
 
+on:
+  schedule:
+    # 매주 월요일 한국 시간(KST) 오전 9시 (UTC 일요일 24:00 / 월요일 00:00)
+    - cron: '0 0 * * 1'
+  workflow_dispatch: # 테스트를 위해 버튼 클릭으로 즉시 실행할 수 있게 해주는 옵션
+
+jobs:
+  run-curator:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. 코드를 가상 머신으로 가져오기
+        uses: actions/checkout@v4
+
+      - name: 2. Python 환경 세팅
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 3. 필요한 라이브러리 설치
+        run: |
+          pip install feedparser openai requests
+
+      - name: 4. 스크립트 실행
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
+        run: |
+          python main.py
